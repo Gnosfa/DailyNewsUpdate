@@ -46,7 +46,7 @@ def upload_to_google_drive(content):
     # File Metadata targeting your specific shared folder
     file_metadata = {
         'name': file_name,
-        'mimeType': 'text/markdown'
+        'mimetype': 'text/markdown'
     }
     
     # Convert string payload into standard upload stream
