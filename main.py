@@ -51,7 +51,7 @@ def upload_to_google_drive(content):
     }
     
     # Convert string payload into standard upload stream
-    media = MediaInMemoryUpload(content.encode('utf-8'), mimeType='text/markdown')
+    media = MediaInMemoryUpload(content.encode('utf-8'), mimetype='text/markdown')
     
     # Execute creation request
     uploaded_file = service.files().create(
