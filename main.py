@@ -46,7 +46,6 @@ def upload_to_google_drive(content):
     # File Metadata targeting your specific shared folder
     file_metadata = {
         'name': file_name,
-        'parents': [DRIVE_FOLDER_ID],
         'mimeType': 'text/markdown'
     }
     
