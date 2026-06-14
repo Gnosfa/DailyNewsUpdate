@@ -1,0 +1,31 @@
+name: Daily News Automation
+
+on:
+  schedule:
+    # Runs everyday at exactly 07:00 AM UTC
+    - cron: '0 7 * * *'
+  workflow_dispatch: # This adds a manual "Run workflow" button in GitHub
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository Code
+      uses: actions/checkout@v4
+
+    - name: Setup Python Environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib requests
+
+    # 🔒 SECURE STEP: Recreates the credentials file from your GitHub Secret
+    - name: Create Credentials File
+      run: |
+        echo '${{ secrets.DRIVE_CREDENTIALS }}' > credentials.json
+
+    - name: Execute Script
+      run: python main.py
