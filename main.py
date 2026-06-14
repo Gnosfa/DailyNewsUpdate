@@ -7,7 +7,7 @@ from googleapiclient.http import MediaInMemoryUpload
 
 # --- CONFIGURATION ---
 # Replace with the long string of characters from your Google Drive folder's URL
-DRIVE_FOLDER_ID = https://drive.google.com/drive/folders/1E7xTcbHuuWtxAOalgKzHby9bdj4ITAR- 
+DRIVE_FOLDER_ID = "https://drive.google.com/drive/folders/1E7xTcbHuuWtxAOalgKzHby9bdj4ITAR-"
 SERVICE_ACCOUNT_FILE = "credentials.json"
 
 def fetch_daily_news():
