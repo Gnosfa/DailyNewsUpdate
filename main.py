@@ -15,16 +15,16 @@ def fetch_daily_news():
     Fetches raw daily news headers across your 5 custom categories.
     Using NewsAPI.org developer tier as a placeholder.
     """
-    categories = ["Current Affairs", "Business", "Technology", "Agriculture", "Sports"] [cite: 2]
+    categories = ["Current Affairs", "Business", "Technology", "Agriculture", "Sports"]
     
     # 1. Establish the current date for the document header
     today_str = datetime.date.today().strftime("%B %d, %Y")
-    markdown_content = f"# 📰 Daily News Update - {today_str}\n\n---\n\n" [cite: 8, 50]
+    markdown_content = f"# 📰 Daily News Update - {today_str}\n\n---\n\n"
     
     # 2. Loop through categories and mock/fetch data
     for category in categories:
         markdown_content += f"## {category}\n"
-        # In production, replace this with active requests.get() calls to your NewsAPI endpoint [cite: 6]
+        # In production, replace this with active requests.get() calls to your NewsAPI endpoint
         markdown_content += f"* **Verified Update 1:** Major global developments occurred in {category} today.\n"
         markdown_content += f"* **Verified Update 2:** Secondary credible market or regional event logged successfully.\n\n"
         
@@ -35,34 +35,34 @@ def upload_to_google_drive(content):
     Authenticates with Google Drive, uploads the file to the service account's space,
     and then auto-shares it with the user to bypass standard storage quotas.
     """
-    # Define API scopes and authenticate 
-    SCOPES = ['https://www.googleapis.com/auth/drive'] [cite: 168]
-    creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES) [cite: 168]
-    service = build('drive', 'v3', credentials=creds) [cite: 168]
+    # Define API scopes and authenticate
+    SCOPES = ['https://www.googleapis.com/auth/drive']
+    creds = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    service = build('drive', 'v3', credentials=creds)
     
-    # Dynamically generate the filename with the daily date 
-    current_date = datetime.date.today().strftime("%Y-%m-%d") [cite: 168]
-    file_name = f"Daily_Update_{current_date}.md" [cite: 168]
+    # Dynamically generate the filename with the daily date
+    current_date = datetime.date.today().strftime("%Y-%m-%d")
+    file_name = f"Daily_Update_{current_date}.md"
     
-    # File Metadata targeting the service account's own root space (Bypasses Quota Error) [cite: 321, 331]
+    # File Metadata targeting the service account's own root space (Bypasses Quota Error)
     file_metadata = {
         'name': file_name,
-        'mimeType': 'text/markdown' [cite: 168]
+        'mimeType': 'text/markdown'
     }
     
-    # Convert string payload into standard upload stream 
-    media = MediaInMemoryUpload(content.encode('utf-8'), mimetype='text/markdown') [cite: 168, 238]
+    # Convert string payload into standard upload stream
+    media = MediaInMemoryUpload(content.encode('utf-8'), mimetype='text/markdown')
     
-    # 1. Execute file creation request 
+    # 1. Execute file creation request
     uploaded_file = service.files().create(
         body=file_metadata,
         media_body=media,
-        fields='id' [cite: 168]
-    ).execute() [cite: 168]
+        fields='id'
+    ).execute()
     
     file_id = uploaded_file.get('id')
     
-    # 2. 🔑 CRITICAL ADDITION: Automatically share this file with your personal email
+    # 2. Automatically share this file with your personal email
     permission_metadata = {
         'type': 'user',
         'role': 'writer',  # Allows you to move, edit, or organize it freely
@@ -77,5 +77,5 @@ def upload_to_google_drive(content):
     print(f"🎉 Success! Generated, uploaded, and shared: '{file_name}' (ID: {file_id})")
 
 if __name__ == "__main__":
-    news_data = fetch_daily_news() [cite: 168]
-    upload_to_google_drive(news_data) [cite: 168]
+    news_data = fetch_daily_news()
+    upload_to_google_drive(news_data)
