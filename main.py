@@ -18,6 +18,12 @@ def call_gemini(prompt):
     }
     response = requests.post(GEMINI_URL, json=payload)
     result = response.json()
+    
+    # ✅ Debug — print full response if no candidates
+    if "candidates" not in result:
+        print(f"❌ Gemini API error response: {result}", flush=True)
+        raise Exception(f"Gemini API error: {result}")
+    
     return result["candidates"][0]["content"]["parts"][0]["text"]
 
 def fetch_category_news(category, extra_context=""):
