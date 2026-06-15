@@ -1,25 +1,91 @@
 import datetime
 import os
 import sys
+import requests
 
 print(f"Python version: {sys.version}", flush=True)
 print("Script started", flush=True)
 
 # --- CONFIGURATION ---
-USER_EMAIL = "gnosfa@gmail.com"
+GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
+
+def call_gemini(prompt):
+    payload = {
+        "contents": [{
+            "parts": [{"text": prompt}]
+        }]
+    }
+    response = requests.post(GEMINI_URL, json=payload)
+    result = response.json()
+    return result["candidates"][0]["content"]["parts"][0]["text"]
+
+def fetch_category_news(category, extra_context=""):
+    print(f"🔍 Fetching {category} news...", flush=True)
+    prompt = f"""
+You are a professional news analyst. Today is {datetime.date.today().strftime("%B %d, %Y")}.
+
+Give me the TOP 5 most important {category} news stories from today or the last 24 hours.
+{extra_context}
+
+For each story provide:
+1. A clear headline
+2. A 2-3 sentence summary of what happened
+3. The impact — who is affected and why it matters
+
+Format each story exactly like this:
+
+### [Headline]
+**What happened:** [2-3 sentence summary]
+**Impact:** [Who is affected and why it matters]
+
+---
+
+Only include verified, credible news. No speculation.
+"""
+    return call_gemini(prompt)
 
 def fetch_daily_news():
-    print("📰 Inside fetch_daily_news...", flush=True)
-    categories = ["Current Affairs", "Business", "Technology", "Agriculture", "Sports"]
+    print("📰 Starting news fetch...", flush=True)
     today_str = datetime.date.today().strftime("%B %d, %Y")
-    markdown_content = f"# 📰 Daily News Update - {today_str}\n\n---\n\n"
-    
-    for category in categories:
-        markdown_content += f"## {category}\n"
-        markdown_content += f"* **Verified Update 1:** Major global developments occurred in {category} today.\n"
-        markdown_content += f"* **Verified Update 2:** Secondary credible market or regional event logged successfully.\n\n"
-    
-    print("📰 News content generated.", flush=True)
+    markdown_content = f"# 📰 Daily News Brief - {today_str}\n\n---\n\n"
+
+    categories = [
+        {
+            "name": "Current Affairs",
+            "context": "Focus on major geopolitical, policy, and world events."
+        },
+        {
+            "name": "Business & Economy",
+            "context": "Focus on markets, trade, corporate news, and economic indicators. Include US market movements."
+        },
+        {
+            "name": "Technology & AI",
+            "context": "Focus on AI developments, tech industry news, product launches, and regulatory updates."
+        },
+        {
+            "name": "Agriculture & Turmeric Markets",
+            "context": """Focus on:
+- Turmeric prices on NCDEX and MCX futures
+- Spot market prices in Erode, Nizamabad, and Sangli
+- India spice export news
+- US and global agriculture commodity news
+- Weather impacts on crops
+Only cite verified sources like NCDEX.com, Agmarknet.gov.in, The Hindu BusinessLine, Economic Times Agri."""
+        },
+        {
+            "name": "Sports",
+            "context": "Focus on major results and upcoming events across cricket, football, tennis, and US sports."
+        }
+    ]
+
+    for cat in categories:
+        markdown_content += f"## {cat['name']}\n\n"
+        news = fetch_category_news(cat['name'], cat['context'])
+        markdown_content += news
+        markdown_content += "\n\n"
+        print(f"✅ {cat['name']} done.", flush=True)
+
     return markdown_content
 
 def save_daily_update(content):
@@ -36,7 +102,6 @@ if __name__ == "__main__":
     print("🔄 Starting script...", flush=True)
     try:
         news_data = fetch_daily_news()
-        print("📰 News fetched, saving file...", flush=True)
         saved_file = save_daily_update(news_data)
         print(f"✅ Done. File saved: {saved_file}", flush=True)
     except Exception as e:
