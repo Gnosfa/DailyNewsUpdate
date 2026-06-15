@@ -1,37 +1,10 @@
-name: Daily News Automation
-on:
-  schedule:
-    - cron: '0 7 * * *'
-  workflow_dispatch:
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-jobs:
-  run-pipeline:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout Repository Code
-      uses: actions/checkout@v5
-
-    - name: Setup Python Environment
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.11'
-
-    - name: Install Dependencies
-      run: |
-        pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib requests
-
-    - name: Create Credentials File
-      env:
-        DRIVE_CREDENTIALS: ${{ secrets.DRIVE_CREDENTIALS }}
-      run: echo "$DRIVE_CREDENTIALS" > credentials.json
-
-    - name: Validate Credentials File
-      run: |
-        echo "File size: $(wc -c < credentials.json) bytes"
-        python -c "import json; json.load(open('credentials.json')); print('✅ Valid JSON')"
-
-    - name: Execute Script
+- name: Execute Script
       run: python main.py
+
+    - name: Commit Daily Update
+      run: |
+        git config user.name "github-actions"
+        git config user.email "actions@github.com"
+        git add daily_updates/
+        git commit -m "Daily update $(date +%Y-%m-%d)" || echo "Nothing to commit"
+        git push
