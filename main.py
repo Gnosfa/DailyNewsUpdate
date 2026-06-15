@@ -36,7 +36,7 @@ def upload_to_google_drive(content):
     current_date = datetime.date.today().strftime("%Y-%m-%d")
     file_name = f"Daily_Update_{current_date}.md"
     
-    FOLDER_ID = "1E7xTcbHuuWtxAOalgKzHby9bdj4ITAR-"
+    FOLDER_ID = "1fYo1bsE4xlrh9UxCCnXpo_hyicgwknoE"
     
     file_metadata = {
         'name': file_name,
