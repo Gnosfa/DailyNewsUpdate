@@ -1,6 +1,7 @@
 import datetime
 import os
 import sys
+import time
 import requests
 
 print(f"Python version: {sys.version}", flush=True)
@@ -19,7 +20,6 @@ def call_gemini(prompt):
     response = requests.post(GEMINI_URL, json=payload)
     result = response.json()
     
-    # ✅ Debug — print full response if no candidates
     if "candidates" not in result:
         print(f"❌ Gemini API error response: {result}", flush=True)
         raise Exception(f"Gemini API error: {result}")
@@ -85,12 +85,16 @@ Only cite verified sources like NCDEX.com, Agmarknet.gov.in, The Hindu BusinessL
         }
     ]
 
-    for cat in categories:
+    for i, cat in enumerate(categories):
         markdown_content += f"## {cat['name']}\n\n"
         news = fetch_category_news(cat['name'], cat['context'])
         markdown_content += news
         markdown_content += "\n\n"
         print(f"✅ {cat['name']} done.", flush=True)
+        
+        if i < len(categories) - 1:
+            print(f"⏳ Waiting 10 seconds before next call...", flush=True)
+            time.sleep(10)
 
     return markdown_content
 
